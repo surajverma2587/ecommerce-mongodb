@@ -1,0 +1,21 @@
+[
+  {
+    "name": "Jordans",
+    "category": "Shoes",
+    "tags": ["Red", "Sport"]
+  },
+  {
+    "name": "PS5",
+    "category": "Gaming",
+    "tags": ["White", "Limited Edition"]
+  },
+  {
+    "name": "Toaster",
+    "category": "Homeware"
+  },
+  {
+    "name": "Nike",
+    "category": "Shoes",
+    "tags": ["Summer", "Sport"]
+  }
+]
