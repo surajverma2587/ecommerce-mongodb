@@ -1,5 +1,7 @@
 const { ObjectId } = require("mongodb");
 
+const { Product } = require("../models");
+
 const getPayloadWithValidFieldsOnly = (validFields, payload) =>
   Object.entries(payload).reduce(
     (acc, [key, value]) =>
@@ -9,7 +11,7 @@ const getPayloadWithValidFieldsOnly = (validFields, payload) =>
 
 const getAllProducts = async (req, res) => {
   try {
-    const products = await req.db.collection("products").find().toArray();
+    const products = await Product.find({});
     return res.json(products);
   } catch (error) {
     console.log(`[ERROR]: Failed to get all products | ${error.message}`);
@@ -21,10 +23,7 @@ const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const products = await req.db
-      .collection("products")
-      .find({ _id: ObjectId(id) })
-      .toArray();
+    const products = await Product.find({ _id: ObjectId(id) });
     return res.json(products);
   } catch (error) {
     console.log(`[ERROR]: Failed to get product | ${error.message}`);
@@ -36,13 +35,18 @@ const createProduct = async (req, res) => {
   try {
     const { name, category, tags = [] } = req.body;
 
-    const products = await req.db
-      .collection("products")
-      .insertOne({ name, category, tags });
-    return res.json(products);
+    const newProduct = new Product({ name, category, tags });
+
+    newProduct.name = newProduct.name.toUpperCase();
+
+    await newProduct.save();
+
+    return res.json({ success: true, message: "Created product successfully" });
   } catch (error) {
     console.log(`[ERROR]: Failed to get product | ${error.message}`);
-    return res.status(500).json({ error: "Failed to get product" });
+    return res
+      .status(500)
+      .json({ success: false, error: "Failed to get product" });
   }
 };
 
@@ -55,17 +59,20 @@ const updateProductById = async (req, res) => {
       req.body
     );
 
-    const product = await req.db.collection("products").findOneAndUpdate(
-      { _id: ObjectId(id) },
+    await Product.findByIdAndUpdate(
+      ObjectId(id),
       { $set: { ...payload } },
       {
-        returnNewDocument: true,
+        returnDocument: "after",
+        lean: true,
       }
     );
-    return res.json(product);
+    return res.json({ success: true, message: "Updated product successfully" });
   } catch (error) {
     console.log(`[ERROR]: Failed to update product | ${error.message}`);
-    return res.status(500).json({ error: "Failed to update product" });
+    return res
+      .status(500)
+      .json({ success: false, error: "Failed to update product" });
   }
 };
 
@@ -73,13 +80,13 @@ const deleteProductById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const products = await req.db
-      .collection("products")
-      .deleteOne({ _id: ObjectId(id) });
-    return res.json(products);
+    await Product.findByIdAndDelete(ObjectId(id));
+    return res.json({ success: true, message: "Deleted product successfully" });
   } catch (error) {
     console.log(`[ERROR]: Failed to get product | ${error.message}`);
-    return res.status(500).json({ error: "Failed to get product" });
+    return res
+      .status(500)
+      .json({ success: false, error: "Failed to get product" });
   }
 };
 

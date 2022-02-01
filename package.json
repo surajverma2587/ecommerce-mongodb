@@ -20,7 +20,8 @@
   "homepage": "https://github.com/surajverma2587/ecommerce-mongodb#readme",
   "dependencies": {
     "express": "^4.17.2",
-    "mongodb": "^4.3.1"
+    "mongodb": "^4.3.1",
+    "mongoose": "^6.1.10"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
